@@ -32,6 +32,7 @@ dist-ssr
 
 # Agent skills (do not push)
 videojs-skills
+COMMIT_MSG.txt
 .DS_Store
 *.suo
 *.ntvs*
