@@ -1,13 +1,30 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import FormPage from './pages/FormPage';
 import StudioPage from './pages/StudioPage';
 
 function App() {
+  const [formData, setFormData] = useState(null);
+
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<FormPage />} />
-        <Route path="/studio" element={<StudioPage />} />
+        <Route
+          path="/"
+          element={
+            <FormPage formData={formData} onComplete={(data) => setFormData(data)} />
+          }
+        />
+        <Route
+          path="/studio"
+          element={
+            formData ? (
+              <StudioPage initialData={formData} />
+            ) : (
+              <Navigate to="/" replace />
+            )
+          }
+        />
       </Routes>
     </BrowserRouter>
   );

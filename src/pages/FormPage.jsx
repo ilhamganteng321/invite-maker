@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { initialForm } from '../data/formDefaults';
 import { validateSection, requiredFields } from '../data/validation';
+import { saveText, loadText, saveBlob, loadBlob } from '../data/storage';
 import Header from '../components/layout/Header';
 import Stepper from '../components/layout/Stepper';
 import NavButtons from '../components/layout/NavButtons';
@@ -15,35 +17,64 @@ const SECTIONS = [
   { id: 2, component: ParentsSection, fields: ['ayahPria', 'ibuPria', 'ayahWanita', 'ibuWanita', 'kataSambutan'] },
   { id: 3, component: AkadSection, fields: ['tanggalAkad', 'waktuAkad', 'lokasiAkad'] },
   { id: 4, component: ResepsiSection, fields: ['tanggalResepsi', 'waktuResepsi', 'lokasiResepsi'] },
-  { id: 5, component: null, fields: [] }, // Foto review step
+  { id: 5, component: null, fields: [] },
   { id: 6, component: ReviewSection, fields: [] },
 ];
 
 const STORAGE_KEY = 'undangan-video-draft';
 
-export default function FormPage() {
-  const [form, setForm] = useState(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    return saved ? JSON.parse(saved) : initialForm();
-  });
+export default function FormPage({ formData: initialFormData, onComplete }) {
+  const navigate = useNavigate();
+  const [form, setForm] = useState(() => initialForm());
   const [activeStep, setActiveStep] = useState(1);
   const [isDrafting, setIsDrafting] = useState(false);
   const [showErrors, setShowErrors] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Auto-save draft to localStorage
+  // Load draft from IndexedDB + localStorage on mount
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
-  }, [form]);
+    const loadDraft = async () => {
+      try {
+        const saved = await loadText(STORAGE_KEY);
+        if (saved) {
+          const draft = JSON.parse(saved);
+          // Restore foto blob from IndexedDB
+          if (draft.fotoKey) {
+            const blob = await loadBlob(draft.fotoKey);
+            if (blob) {
+              draft.foto = blob;
+            }
+          }
+          setForm(draft);
+        }
+      } catch (e) {
+        console.warn('Gagal memuat draft:', e);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadDraft();
+  }, []);
+
+  // Auto-save draft to IndexedDB + localStorage
+  useEffect(() => {
+    if (isLoading) return;
+    const saveDraft = async () => {
+      try {
+        const { foto, ...textData } = form;
+        await saveText(STORAGE_KEY, JSON.stringify(textData));
+        if (foto) {
+          await saveBlob(STORAGE_KEY, foto);
+        }
+      } catch (e) {
+        console.warn('Gagal menyimpan draft:', e);
+      }
+    };
+    saveDraft();
+  }, [form, isLoading]);
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
-  };
-
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      updateField('foto', file);
-    }
   };
 
   const currentSection = SECTIONS.find((s) => s.id === activeStep);
@@ -75,9 +106,7 @@ export default function FormPage() {
 
   const handleSaveDraft = () => {
     setIsDrafting(true);
-    setTimeout(() => {
-      setIsDrafting(false);
-    }, 800);
+    setTimeout(() => setIsDrafting(false), 800);
   };
 
   const handleSubmit = (e) => {
@@ -87,8 +116,18 @@ export default function FormPage() {
       setShowErrors(true);
       return;
     }
-    // Navigate to studio (handled by parent router)
+    onComplete(form);
+    navigate('/studio');
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl mx-auto px-4 py-12 text-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+        <p className="text-gray-600">Memuat draft...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl mx-auto px-4 py-8">
@@ -99,7 +138,6 @@ export default function FormPage() {
         {currentSection.component ? (
           <currentSection.component form={form} onChange={updateField} />
         ) : (
-          // Step 5: Foto review
           <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 text-center">
             <p className="text-gray-600 mb-4">Foto Mempelai</p>
             {form.foto ? (

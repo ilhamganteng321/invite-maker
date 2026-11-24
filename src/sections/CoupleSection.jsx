@@ -1,4 +1,5 @@
 import FormField from '../components/ui/FormField';
+import PhotoUpload from '../components/ui/PhotoUpload';
 
 export default function CoupleSection({ form, onChange }) {
   return (
@@ -16,7 +17,7 @@ export default function CoupleSection({ form, onChange }) {
           value={form.namaWanita}
           onChange={(v) => onChange('namaWanita', v)}
           required
-          placeholder="Masukkan wanita"
+          placeholder="Masukkan nama wanita"
         />
       </div>
 
@@ -28,17 +29,10 @@ export default function CoupleSection({ form, onChange }) {
         required
       />
 
-      <FormField
-        label="Foto Mempelai"
-        type="file"
-        accept="image/*"
-        value={form.foto?.name ?? ''}
-        onChange={(v) => {
-          // File handling is done via the input element directly in parent
-          onChange('foto', v);
-        }}
+      <PhotoUpload
+        value={form.foto}
+        onChange={(v) => onChange('foto', v)}
         required
-        placeholder="Pilih foto..."
       />
     </div>
   );
