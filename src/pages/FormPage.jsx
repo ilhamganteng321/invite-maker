@@ -84,7 +84,15 @@ export default function FormPage({ formData: initialFormData, onComplete }) {
   };
 
   const handleNext = () => {
-    if (validateCurrent()) {
+    if (isLast) {
+      const result = validateSection(form, requiredFields);
+      if (!result.isValid) {
+        setShowErrors(true);
+        return;
+      }
+      onComplete(form);
+      navigate('/studio');
+    } else if (validateCurrent()) {
       setActiveStep((prev) => prev + 1);
       setShowErrors(false);
     }

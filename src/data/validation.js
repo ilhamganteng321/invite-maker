@@ -2,6 +2,7 @@ export const requiredFields = [
   'namaPria',
   'namaWanita',
   'tanggalNikah',
+  'foto',
   'ayahPria',
   'ibuPria',
   'ayahWanita',
