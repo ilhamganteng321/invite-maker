@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState, useCallback } from 'react';
-import { getSceneAtTime, getTotalDuration, SCENE_DURATION } from '../data/timeline';
+﻿import { useRef, useEffect, useState, useCallback } from 'react';
+import { getSceneAtTime, getTotalDuration, SCENE_DURATION } from '../../data/timeline';
 
 export default function CanvasRenderer({ data, width = 400, height = 711 }) {
   const canvasRef = useRef(null);
@@ -62,7 +62,7 @@ export default function CanvasRenderer({ data, width = 400, height = 711 }) {
     ctx.fillStyle = '#4b5563';
     ctx.font = 'italic 18px serif';
     ctx.textAlign = 'center';
-    ctx.fillText(`"${d.kataSambutan || '-}"`, cx, topY + 180);
+    ctx.fillText(`"${d.kataSambutan || '-'}"`, cx, topY + 180);
   }, [width]);
 
   const drawScene4 = useCallback((ctx, cx, topY, d) => {
@@ -122,6 +122,28 @@ export default function CanvasRenderer({ data, width = 400, height = 711 }) {
     ctx.font = 'bold 20px serif';
     ctx.fillText('Made with love', cx, topY + 110);
   }, []);
+
+  const drawScene3 = useCallback((ctx, cx, topY, d) => {
+    ctx.fillStyle = '#1f2937';
+    ctx.font = 'bold 28px serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Akad Nikah', cx, topY);
+
+    const details = [
+      ['Tanggal', d.tanggalAkad || '-'],
+      ['Waktu', d.waktuAkad || '-'],
+      ['Lokasi', d.lokasiAkad || '-'],
+    ];
+    details.forEach(([label, value], i) => {
+      ctx.fillStyle = '#6b7280';
+      ctx.font = '18px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(label, width * 0.15, topY + 40 + i * 35);
+      ctx.fillStyle = '#1f2937';
+      ctx.font = 'bold 18px sans-serif';
+      ctx.fillText(value, width * 0.45, topY + 40 + i * 35);
+    });
+  }, [width]);
 
   const drawFrame = useCallback(
     (ctx, time) => {
@@ -203,3 +225,4 @@ export default function CanvasRenderer({ data, width = 400, height = 711 }) {
     />
   );
 }
+

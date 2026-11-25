@@ -1,4 +1,4 @@
-export default function ExportStatus({
+﻿export default function ExportStatus({
   status,
   progress,
   onCancel,
@@ -10,7 +10,7 @@ export default function ExportStatus({
     preparing: { label: 'Menyiapkan renderer...', color: 'text-indigo-600', bg: 'bg-indigo-50' },
     recording: { label: 'Merekam video...', color: 'text-emerald-600', bg: 'bg-emerald-50' },
     encoding: { label: 'Mengkodekan video...', color: 'text-amber-600', bg: 'bg-amber-50' },
-    done: { label: 'Ekspor selesai', color: 'text-emerald-700', bg: 'bg-emberald-100' },
+    done: { label: 'Ekspor selesai', color: 'text-emerald-700', bg: 'bg-emerald-100' },
     error: { label: 'Terjadi kesalahan', color: 'text-red-700', bg: 'bg-red-50' },
   };
 
@@ -30,15 +30,17 @@ export default function ExportStatus({
         )}
       </div>
       {status !== 'idle' && status !== 'done' && status !== 'error' && (
-        <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-2">
-          <div
-            className={`h-full rounded-full transition-all duration-300 ${
-              status === 'recording' ? 'bg-emerald-500' : 'bg-indigo-500'
-            }`}
-            style={{ width: `${Math.min(progress, 100)}%` }}
-          />
-        </div>
-        <div className="text-xs text-gray-500">{progress.toFixed(0)}%</div>
+        <>
+          <div className="w-full h-1.5 bg-gray-200 rounded-full overflow-hidden mb-2">
+            <div
+              className={`h-full rounded-full transition-all duration-300 ${
+                status === 'recording' ? 'bg-emerald-500' : 'bg-indigo-500'
+              }`}
+              style={{ width: `${Math.min(progress, 100)}%` }}
+            />
+          </div>
+          <div className="text-xs text-gray-500">{progress.toFixed(0)}%</div>
+        </>
       )}
       {status === 'done' && downloadUrl && (
         <button
@@ -56,3 +58,4 @@ export default function ExportStatus({
     </div>
   );
 }
+
