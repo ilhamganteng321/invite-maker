@@ -31,19 +31,15 @@ export default function FormPage({ formData: initialFormData, onComplete }) {
   const [showErrors, setShowErrors] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Load draft from IndexedDB + localStorage on mount
   useEffect(() => {
     const loadDraft = async () => {
       try {
         const saved = await loadText(STORAGE_KEY);
         if (saved) {
           const draft = JSON.parse(saved);
-          // Restore foto blob from IndexedDB
           if (draft.fotoKey) {
             const blob = await loadBlob(draft.fotoKey);
-            if (blob) {
-              draft.foto = blob;
-            }
+            if (blob) { draft.foto = blob; }
           }
           setForm(draft);
         }
@@ -56,16 +52,13 @@ export default function FormPage({ formData: initialFormData, onComplete }) {
     loadDraft();
   }, []);
 
-  // Auto-save draft to IndexedDB + localStorage
   useEffect(() => {
     if (isLoading) return;
     const saveDraft = async () => {
       try {
         const { foto, ...textData } = form;
         await saveText(STORAGE_KEY, JSON.stringify(textData));
-        if (foto) {
-          await saveBlob(STORAGE_KEY, foto);
-        }
+        if (foto) { await saveBlob(STORAGE_KEY, foto); }
       } catch (e) {
         console.warn('Gagal menyimpan draft:', e);
       }
@@ -86,9 +79,7 @@ export default function FormPage({ formData: initialFormData, onComplete }) {
   const validateCurrent = () => {
     if (currentSection.fields.length === 0) return true;
     const result = validateSection(form, currentSection.fields);
-    if (!result.isValid) {
-      setShowErrors(true);
-    }
+    if (!result.isValid) { setShowErrors(true); }
     return result.isValid;
   };
 

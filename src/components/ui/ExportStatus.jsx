@@ -1,4 +1,4 @@
-﻿export default function ExportStatus({
+export default function ExportStatus({
   status,
   progress,
   onCancel,
@@ -58,4 +58,3 @@
     </div>
   );
 }
-
